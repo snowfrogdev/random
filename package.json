@@ -1,5 +1,5 @@
 {
-    "name": "random",
+    "name": "random-ts",
     "version": "1.0.0",
     "main": "dist/index.html",
     "devDependencies": {
@@ -10,5 +10,7 @@
         "dev": "tsc -w",
         "build": "tsc"
     },
-    "dependencies": {}
+    "dependencies": {
+        "random": "^2.1.1"
+    }
 }

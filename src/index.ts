@@ -1,4 +1,4 @@
-declare const d3: any
+declare const SJS: any;
 
 const canvas = <HTMLCanvasElement>document.getElementById('canvas');
 const ctx = <CanvasRenderingContext2D>canvas.getContext('2d');
@@ -19,19 +19,26 @@ for (let y = 0; y < 512; y++) {
 const arr: number[] = Array(1024);
 arr.fill(0, 0, 1024);
 
+const rand = getRandomIntInclusivePareto(0, 1024, 1)
+
 function loop(i = 0) {
-  if (i < 110e3) {
-    const index = getRandomIntInclusiveNormal(0, 1024, 1);
-    const count = arr[index]++;
-    ctx.fillRect(index, count, 1, 1);
-    if (i % 100 === 0) {
-      setTimeout(() => loop(i + 1));
-    } else {
-      loop(i + 1);
+  return new Promise(resolve => {
+    if (i < 110e3) {
+      const index = rand();
+      const count = arr[index]++;
+      ctx.fillRect(index, count, 1, 1);
+      if (i % 100 === 0) {
+        return setTimeout(() => resolve(loop(i + 1)));
+      } else {
+        resolve(loop(i + 1));
+      }
     }
-  }
+    resolve()
+  })  
 }
-loop();
+loop().then(_ => {
+  
+})
 
 function randn_bm(min: number, max: number, skew: number) {
   let u = 0;
@@ -48,6 +55,16 @@ function randn_bm(min: number, max: number, skew: number) {
   return num;
 }
 
+function getRandomIntInclusivePareto(min: number, max: number, alpha = 1) {
+  var probabilities = []; // probabilities
+  for (var k = min; k <= max; ++k) {
+    probabilities.push(1.0 / Math.pow(k, alpha)); // computed according to Paretto
+  } // would be normalized by SJS
+
+  var disc = SJS.Discrete(probabilities); // discrete sampler, returns value in the [0...probabilities.length-1] range
+  return () => disc.draw() + min; // back to [min...max] interval
+}
+
 function getRandomIntInclusiveNormal(min: number, max: number, skew = 1) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -59,3 +76,8 @@ function getRandomIntInclusive(min: number, max: number) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive
 }
+
+
+
+
+/****************************************************************/
